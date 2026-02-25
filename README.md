@@ -2,47 +2,67 @@
 
 This is a backend service built for the **Bitespeed Backend Task – Identity Reconciliation**.
 
-The service consolidates multiple contact records (email and phone number) into a single unified customer identity.
+The service consolidates multiple contact records (email and phone number) into a single unified customer identity based on reconciliation rules defined in the assignment.
 
 ---
+
 ## 🚀 Live Deployment
 
-Base URL: https://identity-reconciliation-or8i.onrender.com
+**Base URL:**  
+https://identity-reconciliation-or8i.onrender.com
 
 ### Identify Endpoint
-POST https://identity-reconciliation-or8i.onrender.com/identify
+**POST**  
+https://identity-reconciliation-or8i.onrender.com/identify
 
 ### Example Request
+
 ```bash
 curl -X POST https://identity-reconciliation-or8i.onrender.com/identify \
   -H "Content-Type: application/json" \
   -d '{"email":"lorraine@hillvalley.edu","phoneNumber":"123456"}'
+```
+
+### Example Response
+
+```json
+{
+  "contact": {
+    "primaryContactId": 1,
+    "emails": ["lorraine@hillvalley.edu"],
+    "phoneNumbers": ["123456"],
+    "secondaryContactIds": []
+  }
+}
+```
+
+---
 
 ## 🚀 Tech Stack
 
 - **Node.js** with **TypeScript**
 - **Express**
 - **Knex.js**
-- **SQLite (SQL database)**
+- **SQLite** (Local Development)
+- **PostgreSQL** (Production - Render Hosted)
 
 ---
 
 ## 📂 Project Structure
 
 ```
-BiteSpeed-Backend/
+Identity-Reconciliation/
 │
 ├── src/
-│   ├── db.js
+│   ├── db.ts
 │   ├── index.ts
 │   └── tests/
 │       ├── directTest.js
 │       └── apiTest.js
 │
 ├── migrations/
-│   └── 20231027000000_create_contacts_table.ts
+│   └── 20231027000000_create_contacts_table.js
 │
-├── dev.sqlite3
 ├── knexfile.js
 ├── package.json
 ├── tsconfig.json
@@ -52,7 +72,7 @@ BiteSpeed-Backend/
 
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Setup Instructions (Local Development)
 
 ### 1️⃣ Install Dependencies
 
@@ -68,14 +88,14 @@ npm install
 npm run migrate
 ```
 
-This creates the `Contact` table in SQLite.
+This creates the `Contact` table in the local SQLite database.
 
 ---
 
 ### 3️⃣ Start the Server
 
 ```bash
-npm start
+npm run dev
 ```
 
 Server will run at:
@@ -94,7 +114,7 @@ This endpoint reconciles contact details and returns a consolidated identity.
 
 ---
 
-### Request Body
+### Request Body (JSON Only)
 
 ```json
 {
@@ -103,15 +123,16 @@ This endpoint reconciles contact details and returns a consolidated identity.
 }
 ```
 
-At least one of:
+At least one of the following must be provided:
+
 - `email`
 - `phoneNumber`
 
-must be provided.
+⚠️ The API strictly accepts **JSON body**, not form-data.
 
 ---
 
-### Success Response (200 OK)
+## 📤 Success Response (200 OK)
 
 ```json
 {
@@ -134,32 +155,32 @@ must be provided.
 ## 🔍 Identity Resolution Rules
 
 - Contacts are linked if they share the same **email OR phoneNumber**.
-- The **oldest contact (by createdAt)** is always the primary.
-- New information results in creation of a secondary contact.
+- The **oldest contact (by createdAt)** is always the primary contact.
+- If new information is introduced, a new **secondary contact** is created.
 - If two primary contacts become linked, the oldest remains primary and the newer becomes secondary.
-- All reconciliation logic runs inside a database transaction to prevent race conditions.
-- Response format strictly follows the assignment requirements.
+- All reconciliation logic runs inside a **database transaction** to prevent race conditions.
+- The response format strictly follows the assignment specification.
 
 ---
 
 ## 🧪 Testing
 
-### Direct Database Logic Test
+### 1️⃣ Direct Database Logic Test
 
 ```bash
 npm run test:direct
 ```
 
-This tests reconciliation logic directly using database transactions.
+Tests reconciliation logic directly using database transactions.
 
 ---
 
-### API-Level Test
+### 2️⃣ API-Level Test
 
 Start the server first:
 
 ```bash
-npm start
+npm run dev
 ```
 
 Then in another terminal:
@@ -170,7 +191,7 @@ npm run test:api
 
 ---
 
-## 🧪 Manual Testing (cURL Example)
+## 🧪 Manual Testing (Local cURL Example)
 
 ```bash
 curl -X POST http://localhost:3000/identify \
@@ -180,22 +201,39 @@ curl -X POST http://localhost:3000/identify \
 
 ---
 
-## ✅ Assignment Compliance
+## 🌐 Production Deployment
+
+The application is deployed on **Render** using:
+
+- PostgreSQL (Render managed database)
+- Environment-based configuration
+- Production-ready build with TypeScript compilation
+
+---
+
+## ✅ Assignment Compliance Checklist
 
 This implementation:
 
-- Uses a SQL database
-- Enforces oldest-contact-as-primary rule
-- Handles primary-to-secondary conversion
-- Uses database transactions for safety
-- Returns response in required format
-- Accepts JSON body (not form-data)
-- Includes test scripts for verification
+- ✔ Uses a SQL database
+- ✔ Enforces oldest-contact-as-primary rule
+- ✔ Handles primary-to-secondary conversion correctly
+- ✔ Uses database transactions for data integrity
+- ✔ Returns response in the required format
+- ✔ Accepts JSON body (not form-data)
+- ✔ Is deployed and publicly accessible
+- ✔ Includes test scripts for validation
 
 ---
 
 ## 📌 Notes
 
 - SQLite is used for simplicity in local development.
-- The system can be easily switched to PostgreSQL for production deployment.
+- PostgreSQL is used in production.
 - The application is structured for clarity, maintainability, and scalability.
+- The system design allows easy database switching via environment configuration.
+
+---
+
+**Author:** Sanket Patil  
+GitHub: https://github.com/Sanket-Pandit-Patil/Identity-Reconciliation
