@@ -5,6 +5,18 @@ This is a backend service built for the **Bitespeed Backend Task – Identity Re
 The service consolidates multiple contact records (email and phone number) into a single unified customer identity.
 
 ---
+## 🚀 Live Deployment
+
+Base URL: https://identity-reconciliation-or8i.onrender.com
+
+### Identify Endpoint
+POST https://identity-reconciliation-or8i.onrender.com/identify
+
+### Example Request
+```bash
+curl -X POST https://identity-reconciliation-or8i.onrender.com/identify \
+  -H "Content-Type: application/json" \
+  -d '{"email":"lorraine@hillvalley.edu","phoneNumber":"123456"}'
 
 ## 🚀 Tech Stack
 
