@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
-const db = require('./db');
+import db from "./db";
 
 const app = express();
 const port = process.env.PORT || 3000;
